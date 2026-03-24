@@ -1,7 +1,10 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <base target="_top">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registro de Movimientos</title>
+
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -147,13 +150,22 @@
       font-size: 13px;
       margin-top: 8px;
     }
+
+    @media (max-width: 768px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .fila-botones {
+        flex-direction: column;
+      }
+    }
   </style>
 </head>
 <body>
   <div class="contenedor">
     <h2>Registro de Movimientos</h2>
 
-    <!-- PASO 1 -->
     <div id="paso1">
       <h3>Paso 1: Selecciona origen, destino y responsable</h3>
 
@@ -200,7 +212,6 @@
       </div>
     </div>
 
-    <!-- PASO 2 -->
     <div id="paso2" class="oculto">
       <h3>Paso 2: Completa el movimiento</h3>
 
@@ -273,12 +284,16 @@
   </div>
 
   <script>
+    const API_URL = 'https://script.google.com/macros/s/AKfycbyhe5lkU8SiIv-q15LnW9nCve3cRnNxOEDEwqRIbwFbyEiHN5HU3hPxsCbaVkCm94d5/exec';
     let mapaGrupos = {};
 
-    function cargarMapaGrupos() {
-      google.script.run.withSuccessHandler(function(mapa) {
-        mapaGrupos = mapa || {};
-      }).obtenerMapaGruposWeb();
+    async function cargarMapaGrupos() {
+      try {
+        const respuesta = await fetch(API_URL + '?accion=grupos');
+        mapaGrupos = await respuesta.json();
+      } catch (error) {
+        document.getElementById('mensaje').textContent = 'Error cargando grupos: ' + error.message;
+      }
     }
 
     function irPaso2() {
@@ -366,6 +381,7 @@
       const inputCantidad = document.createElement('input');
       inputCantidad.type = 'number';
       inputCantidad.min = '1';
+      inputCantidad.step = '1';
       inputCantidad.placeholder = 'Cantidad';
 
       const btnEliminar = document.createElement('button');
@@ -413,7 +429,7 @@
       return movimientos;
     }
 
-    function registrar() {
+    async function registrar() {
       const movimientos = obtenerMovimientos();
 
       const datos = {
@@ -441,31 +457,44 @@
 
       mensaje.textContent = 'Registrando...';
 
-      google.script.run
-        .withSuccessHandler(function(respuesta) {
-          mensaje.textContent =
-            'Movimiento registrado correctamente. Registros creados: ' + respuesta.cantidadRegistros + ' | ID: ' + respuesta.idMovimiento;
+      try {
+        const respuesta = await fetch(API_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'text/plain;charset=utf-8'
+          },
+          body: JSON.stringify(datos)
+        });
 
-          document.getElementById('fecha').value = '';
-          document.getElementById('tipo').value = '';
-          document.getElementById('observacion').value = '';
-          document.getElementById('contrato').value = '';
-          document.getElementById('tbodyItems').innerHTML = '';
+        const res = await respuesta.json();
 
-          document.getElementById('origenPaso1').value = '';
-          document.getElementById('destinoPaso1').value = '';
-          document.getElementById('responsablePaso1').value = '';
-          document.getElementById('resumenOrigen').textContent = '';
-          document.getElementById('resumenDestino').textContent = '';
-          document.getElementById('resumenResponsable').textContent = '';
+        if (!res.ok) {
+          throw new Error(res.error || 'No se pudo registrar');
+        }
 
-          document.getElementById('paso2').classList.add('oculto');
-          document.getElementById('paso1').classList.remove('oculto');
-        })
-        .withFailureHandler(function(error) {
-          mensaje.textContent = 'Error: ' + error.message;
-        })
-        .registrarMovimientoWeb(datos);
+        mensaje.textContent =
+          'Movimiento registrado correctamente. Registros creados: ' +
+          res.cantidadRegistros + ' | ID: ' + res.idMovimiento;
+
+        document.getElementById('fecha').value = '';
+        document.getElementById('tipo').value = '';
+        document.getElementById('observacion').value = '';
+        document.getElementById('contrato').value = '';
+        document.getElementById('tbodyItems').innerHTML = '';
+
+        document.getElementById('origenPaso1').value = '';
+        document.getElementById('destinoPaso1').value = '';
+        document.getElementById('responsablePaso1').value = '';
+        document.getElementById('resumenOrigen').textContent = '';
+        document.getElementById('resumenDestino').textContent = '';
+        document.getElementById('resumenResponsable').textContent = '';
+
+        document.getElementById('paso2').classList.add('oculto');
+        document.getElementById('paso1').classList.remove('oculto');
+
+      } catch (error) {
+        mensaje.textContent = 'Error: ' + error.message;
+      }
     }
 
     cargarMapaGrupos();
