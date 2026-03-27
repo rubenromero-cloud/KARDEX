@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Evaluación de Desempeño</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f7fb;
+      margin: 0;
+      padding: 20px;
+      color: #1f2937;
+    }
+
+    .container {
+      max-width: 980px;
+      margin: 0 auto;
+      background: #fff;
+      border-radius: 18px;
+      box-shadow: 0 6px 22px rgba(0,0,0,0.08);
+      padding: 24px;
+    }
+
+    h1 {
+      text-align: center;
+      margin: 0 0 8px 0;
+    }
+
+    .sub {
+      text-align: center;
+      color: #6b7280;
+      margin-bottom: 24px;
+    }
+
+    .volver-menu {
+      display: inline-block;
+      margin-bottom: 16px;
+      text-decoration: none;
+      background: #e5e7eb;
+      color: #111827;
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-weight: bold;
+    }
+
+    .step {
+      display: none;
+    }
+
+    .step.active {
+      display: block;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px;
+    }
+
+    .fila-doble {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-top: 16px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .field label {
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
+
+    .field input,
+    .field select {
+      padding: 12px;
+      border: 1px solid #d1d5db;
+      border-radius: 10px;
+      font-size: 14px;
+      background: #fff;
+    }
+
+    .resumen {
+      margin-bottom: 22px;
+      padding: 14px 16px;
+      background: #eef4ff;
+      border-left: 5px solid #1a73e8;
+      border-radius: 10px;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .bloque {
+      margin-top: 24px;
+      margin-bottom: 12px;
+      padding: 14px 18px;
+      border-left: 6px solid #1a73e8;
+      background: #eef4ff;
+      border-radius: 10px;
+    }
+
+    .bloque h2 {
+      margin: 0;
+      font-size: 20px;
+    }
+
+    .bloque p {
+      margin: 6px 0 0 0;
+      color: #4b5563;
+      font-size: 14px;
+    }
+
+    .item {
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 14px;
+      background: #fafafa;
+    }
+
+    .item-title {
+      font-weight: bold;
+      font-size: 16px;
+      margin-bottom: 8px;
+    }
+
+    .item-desc {
+      color: #4b5563;
+      margin-bottom: 14px;
+      line-height: 1.5;
+    }
+
+    .opciones {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 10px;
+      width: 100%;
+    }
+
+    .opcion input[type="radio"] {
+      display: none;
+    }
+
+    .opcion label {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      min-height: 54px;
+      padding: 0 10px;
+      border: 2px solid #cbd5e1;
+      border-radius: 10px;
+      background: #fff;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.2s;
+      box-sizing: border-box;
+    }
+
+    .opcion label:hover {
+      border-color: #1a73e8;
+    }
+
+    .opcion input[type="radio"]:checked + label {
+      border-color: #1a73e8;
+      background: #1a73e8;
+      color: #fff;
+    }
+
+    .acciones {
+      display: flex;
+      gap: 12px;
+      margin-top: 24px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      flex: 1;
+      min-width: 180px;
+      border: none;
+      border-radius: 12px;
+      padding: 14px;
+      font-size: 15px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .btn-principal {
+      background: #1a73e8;
+      color: white;
+    }
+
+    .btn-secundario {
+      background: #e5e7eb;
+      color: #111827;
+    }
+
+    #mensaje {
+      margin-top: 16px;
+      text-align: center;
+      font-weight: bold;
+    }
+
+    .leyenda-horizontal {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 18px;
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      padding: 12px;
+      border-radius: 12px;
+      font-size: 14px;
+      color: #374151;
+      flex-wrap: wrap;
+    }
+
+    .muted {
+      color: #6b7280;
+      font-size: 13px;
+      margin-top: 6px;
+    }
+
+    .loading {
+      opacity: 0.7;
+      pointer-events: none;
+    }
+
+    @media (max-width: 720px) {
+      .fila-doble {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <a class="volver-menu" href="index.html">← Volver al menú</a>
+
+    <h1>Evaluación de Desempeño</h1>
+    <div class="sub">Formulario en 2 pasos</div>
+
+    <div id="step1" class="step active">
+      <div class="grid">
+        <div class="field">
+          <label for="fecha">Fecha</label>
+          <input type="date" id="fecha">
+        </div>
+
+        <div class="field">
+          <label for="cargoEvaluador">Cargo del evaluador</label>
+          <select id="cargoEvaluador">
+            <option value="">Seleccione</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="evaluadorNombre">Nombre del evaluador</label>
+          <select id="evaluadorNombre">
+            <option value="">Seleccione primero un cargo</option>
+          </select>
+          <div class="muted">Se muestran solo las personas del cargo elegido.</div>
+        </div>
+      </div>
+
+      <div class="acciones">
+        <button class="btn-principal" type="button" onclick="irAPaso2()">Siguiente</button>
+      </div>
+    </div>
+
+    <div id="step2" class="step">
+      <div id="resumen" class="resumen"></div>
+
+      <div class="grid" style="margin-bottom: 18px;">
+        <div class="field">
+          <label for="unidadMinera">Unidad Minera</label>
+          <select id="unidadMinera">
+            <option value="">Seleccione</option>
+            <option value="QUELLAVECO">QUELLAVECO</option>
+            <option value="ANTAPACCAY">ANTAPACCAY</option>
+            <option value="CENTINELA">CENTINELA</option>
+            <option value="SIERRA GORDA">SIERRA GORDA</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="servicio">Servicio</label>
+          <select id="servicio">
+            <option value="">Seleccione primero una unidad minera</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="fila-doble" style="margin-bottom: 18px;">
+        <div class="field">
+          <label for="cargoEvaluado">Cargo de a quién se va a evaluar</label>
+          <select id="cargoEvaluado">
+            <option value="">Seleccione</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="evaluadoNombre">A quién se va a evaluar</label>
+          <select id="evaluadoNombre">
+            <option value="">Seleccione primero un cargo</option>
+          </select>
+          <div class="muted">La lista depende del nivel del evaluador y del cargo elegido.</div>
+        </div>
+      </div>
+
+      <div class="leyenda-horizontal">
+        <strong>Escala:</strong>
+        <span>1 = Bajo</span>
+        <span>2 = Regular</span>
+        <span>3 = Bueno</span>
+      </div>
+
+      <form id="formularioCriterios"></form>
+
+      <div class="acciones">
+        <button class="btn-secundario" type="button" onclick="volverAPaso1()">Atrás</button>
+        <button class="btn-principal" type="button" onclick="guardarTodo()">Guardar evaluación</button>
+      </div>
+    </div>
+
+    <div id="mensaje"></div>
+  </div>
+
+  <script>
+    const API_URL = "https://script.google.com/macros/s/AKfycbwT6GKaVcq82bYkV58znslYAbgt2q79RSAWyJXlaC7Xkj6KMyMtVeXCWowlg985m2tSCA/exec";
+    let config = null;
+
+    const estructura = [
+      {
+        titulo: "1. DESEMPEÑO EN EL TRABAJO",
+        subtitulo: "Logro en oportunidad, eficiencia, calidad y seguridad de las funciones y tareas encomendadas.",
+        items: [
+          { nombre: "1 Responsabilidad", descripcion: "Grado de compromiso que asume para el cumplimiento de las metas." },
+          { nombre: "2 Exactitud y calidad del trabajo", descripcion: "Coherencia entre el trabajo solicitado y el efectivamente realizado, el trabajo cumple con lo requerido y además es de buena calidad." },
+          { nombre: "3 Productividad", descripcion: "Volumen de trabajo que realiza por unidad de tiempo." },
+          { nombre: "4 Orden y claridad del trabajo", descripcion: "Sus desarrollos pueden ser abordados con facilidad por otras personas." },
+          { nombre: "5 Planificación del trabajo", descripcion: "Conocimiento exacto del estado de sus tareas, analiza sus tareas contemplando el tiempo que requiere para llevarlas adelante." },
+          { nombre: "6 Reporte avances de tareas", descripcion: "Frecuencia, constancia y calidad de los reportes. Capacidad de extraer la información relevante al elevar un informe." },
+          { nombre: "7 Comprensión de situaciones", descripcion: "Capacidad de entender conceptos y situaciones rápidamente." },
+          { nombre: "8 Grado de conocimiento técnico", descripcion: "Conocimiento de las distintas herramientas necesarias para desarrollar sus labores." }
+        ]
+      },
+      {
+        titulo: "2. ACTITUD Y COMPORTAMIENTO",
+        subtitulo: "",
+        items: [
+          { nombre: "9 Actitud hacia la empresa", descripcion: "Capacidadd de defender los intereses de la empresa y adherirse a sus lineamientos. Disponibilidad para extender el horario de trabajo ante una necesidad puntual. Lealtad con la empresa." },
+          { nombre: "10 Actitud hacia el cliente", descripcion: "Claridad en la comunicación con el cliente. Respeto, cooperación y cordialidad. Manejo de situaciones conflictivas con el cliente." },
+          { nombre: "11 Cooperación con el equipo", descripcion: "Colaboración en el desarrollo de trabajos de integrantes de otros grupos. Trabajo en equipo. Capacidad de compartir conocimientos y habilidades." },
+          { nombre: "12 Capacidad de aceptar críticas", descripcion: "Capacidad de aceptar críticas constructivas en forma abierta. Grado de adaptación a las mismas. Capacidad de no ofenderse y aprovechar las críticas para mejorar." },
+          { nombre: "13 Capacidad de generar sugerencias constructivas", descripcion: "Cantidad de sugerencias que realiza para mejorar el trabajo, Calidad de las mismas. Capacidad de elevar las sugerencias oportunamente a quien corresponda." },
+          { nombre: "14 Predisposición", descripcion: "Se muestra predispuesto hacia la tarea. Manifiesta una actitud positiva frente a los diferentes requerimientos. Entusiasmo y Motivación." }
+        ]
+      },
+      {
+        titulo: "3. HABILIDADES TECNICAS Y CONOCIMIENTOS",
+        subtitulo: "Mide las competencias del trabajador para el ejercicio del cargo / funciones encomendadas.",
+        items: [
+          { nombre: "15 Iniciativa", descripcion: "Inquietud por avanzar y mejorar. Facilidad para ofercerse como ejecutor de sus propuestas. Tiene empuje." },
+          { nombre: "16 Adaptabilidad", descripcion: "Capacidad para desempeñarse con facilidad en situaciones que no le son naturales. Adaptabilidad a situaciones adversas." },
+          { nombre: "17 Coordinación y liderazgo", descripcion: "Carisma, liderazgo natural, capacidad de mediar en conflictos internos y capacidad de mediar en los conflictos con los clientes." },
+          { nombre: "18 Potencial capacidad de aprendizaje", descripcion: "Tiene perfil funcional. Inquietud y capacidad para conocer las distintas herramientas necesarias para su trabajo." }
+        ]
+      },
+      {
+        titulo: "4. SEGURIDAD",
+        subtitulo: "",
+        items: [
+          { nombre: "19 Cumplimientos de procedimientos existentes", descripcion: "Grado de cumplimiento de normas, procedimientos, estándares y políticas." }
+        ]
+      },
+      {
+        titulo: "5. ASISTENCIA",
+        subtitulo: "",
+        items: [
+          { nombre: "20 Cumplimiento con programación", descripcion: "Grado de cumplimiento de programación a trabajos, cursos, exámenes médicos, etc." }
+        ]
+      }
+    ];
+
+    const serviciosPorUnidad = {
+      QUELLAVECO: ["QUELLAVECO"],
+      ANTAPACCAY: ["ANTAPACCAY"],
+      "SIERRA GORDA": ["SIERRA GORDA"],
+      CENTINELA: ["MET", "OXI", "RIPIOS"]
+    };
+
+    function setMensaje(texto) {
+      document.getElementById("mensaje").innerText = texto || "";
+    }
+
+    async function apiGet(params) {
+      const url = new URL(API_URL);
+      Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
+
+      const response = await fetch(url.toString());
+      const data = await response.json();
+
+      if (data && data.ok === false) {
+        throw new Error(data.error || "Error en la consulta");
+      }
+
+      return data;
+    }
+
+    async function apiPost(body) {
+      const response = await fetch(API_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "text/plain;charset=utf-8"
+        },
+        body: JSON.stringify(body)
+      });
+
+      const data = await response.json();
+
+      if (data && data.ok === false) {
+        throw new Error(data.error || "Error en el registro");
+      }
+
+      return data;
+    }
+
+    async function cargarConfiguracion() {
+      try {
+        config = await apiGet({ accion: "configuracion" });
+        cargarCargos();
+        renderFormularioCriterios();
+
+        const hoy = new Date().toISOString().split("T")[0];
+        document.getElementById("fecha").value = hoy;
+      } catch (error) {
+        setMensaje("Error al cargar configuración: " + error.message);
+      }
+    }
+
+    function cargarCargos() {
+      const cargoEvaluador = document.getElementById("cargoEvaluador");
+
+      cargoEvaluador.innerHTML = '<option value="">Seleccione</option>';
+
+      config.cargos.forEach(cargo => {
+        const op1 = document.createElement("option");
+        op1.value = cargo;
+        op1.textContent = cargo;
+        cargoEvaluador.appendChild(op1);
+      });
+
+      cargoEvaluador.addEventListener("change", actualizarEvaluadoresPorCargo);
+      document.getElementById("cargoEvaluado").addEventListener("change", actualizarEvaluadosPorCargo);
+      document.getElementById("unidadMinera").addEventListener("change", actualizarServiciosPorUnidad);
+    }
+
+    function actualizarServiciosPorUnidad() {
+      const unidad = document.getElementById("unidadMinera").value;
+      const selectServicio = document.getElementById("servicio");
+
+      selectServicio.innerHTML = "";
+
+      if (!unidad) {
+        selectServicio.innerHTML = '<option value="">Seleccione primero una unidad minera</option>';
+        return;
+      }
+
+      const servicios = serviciosPorUnidad[unidad] || [];
+      selectServicio.innerHTML = '<option value="">Seleccione</option>';
+
+      servicios.forEach(servicio => {
+        const option = document.createElement("option");
+        option.value = servicio;
+        option.textContent = servicio;
+        selectServicio.appendChild(option);
+      });
+    }
+
+    function actualizarEvaluadoresPorCargo() {
+      const cargo = document.getElementById("cargoEvaluador").value;
+      const select = document.getElementById("evaluadorNombre");
+
+      select.innerHTML = '<option value="">Seleccione</option>';
+
+      if (!cargo) {
+        select.innerHTML = '<option value="">Seleccione primero un cargo</option>';
+        return;
+      }
+
+      const filtrados = config.personal
+        .filter(p => p.cargo === cargo)
+        .sort((a, b) => a.nombre.localeCompare(b.nombre, "es", { sensitivity: "base" }));
+
+      filtrados.forEach(p => {
+        const option = document.createElement("option");
+        option.value = p.nombre;
+        option.textContent = p.nombre;
+        select.appendChild(option);
+      });
+    }
+
+    async function actualizarEvaluadosPorCargo() {
+      const evaluadorNombre = document.getElementById("evaluadorNombre").value;
+      const cargoEvaluado = document.getElementById("cargoEvaluado").value;
+      const select = document.getElementById("evaluadoNombre");
+
+      select.innerHTML = '<option value="">Seleccione</option>';
+
+      if (!evaluadorNombre) {
+        select.innerHTML = '<option value="">Vuelva y seleccione al evaluador</option>';
+        return;
+      }
+
+      if (!cargoEvaluado) {
+        select.innerHTML = '<option value="">Seleccione primero un cargo</option>';
+        return;
+      }
+
+      select.classList.add("loading");
+
+      try {
+        const evaluados = await apiGet({
+          accion: "evaluados",
+          evaluadorNombre,
+          cargoEvaluado
+        });
+
+        select.classList.remove("loading");
+        select.innerHTML = '<option value="">Seleccione</option>';
+
+        if (!evaluados || evaluados.length === 0) {
+          select.innerHTML = '<option value="">No hay personas disponibles</option>';
+          return;
+        }
+
+        evaluados.forEach(p => {
+          const option = document.createElement("option");
+          option.value = p.nombre;
+          option.textContent = p.nombre;
+          select.appendChild(option);
+        });
+      } catch (error) {
+        select.classList.remove("loading");
+        setMensaje("Error al cargar evaluados: " + error.message);
+      }
+    }
+
+    function renderFormularioCriterios() {
+      const form = document.getElementById("formularioCriterios");
+      form.innerHTML = "";
+
+      let contador = 1;
+
+      estructura.forEach((bloque) => {
+        const bloqueDiv = document.createElement("div");
+        bloqueDiv.className = "bloque";
+        bloqueDiv.innerHTML = `
+          <h2>${bloque.titulo}</h2>
+          ${bloque.subtitulo ? `<p>${bloque.subtitulo}</p>` : ""}
+        `;
+        form.appendChild(bloqueDiv);
+
+        bloque.items.forEach((item) => {
+          const itemDiv = document.createElement("div");
+          itemDiv.className = "item";
+
+          itemDiv.innerHTML = `
+            <div class="item-title">${item.nombre}</div>
+            <div class="item-desc">${item.descripcion}</div>
+            <div class="opciones">
+              <div class="opcion">
+                <input type="radio" id="item${contador}_1" name="item${contador}" value="1">
+                <label for="item${contador}_1">1 - Bajo</label>
+              </div>
+              <div class="opcion">
+                <input type="radio" id="item${contador}_2" name="item${contador}" value="2">
+                <label for="item${contador}_2">2 - Regular</label>
+              </div>
+              <div class="opcion">
+                <input type="radio" id="item${contador}_3" name="item${contador}" value="3">
+                <label for="item${contador}_3">3 - Bueno</label>
+              </div>
+            </div>
+          `;
+
+          form.appendChild(itemDiv);
+          contador++;
+        });
+      });
+    }
+
+    async function irAPaso2() {
+      const fecha = document.getElementById("fecha").value;
+      const cargoEvaluador = document.getElementById("cargoEvaluador").value;
+      const evaluadorNombre = document.getElementById("evaluadorNombre").value;
+
+      if (!fecha || !cargoEvaluador || !evaluadorNombre) {
+        setMensaje("Complete todos los campos de la primera página.");
+        return;
+      }
+
+      setMensaje("");
+
+      try {
+        const info = await apiGet({
+          accion: "infoEvaluador",
+          evaluadorNombre
+        });
+
+        document.getElementById("step1").classList.remove("active");
+        document.getElementById("step2").classList.add("active");
+
+        document.getElementById("resumen").innerHTML = `
+          <strong>Fecha:</strong> ${fecha}<br>
+          <strong>Cargo del evaluador:</strong> ${cargoEvaluador}<br>
+          <strong>Evaluador:</strong> ${evaluadorNombre}<br>
+          <strong>Nivel del evaluador:</strong> ${info.nivelEvaluador}
+        `;
+
+        const cargoEvaluado = document.getElementById("cargoEvaluado");
+        cargoEvaluado.innerHTML = '<option value="">Seleccione</option>';
+
+        info.cargosPermitidos.forEach(cargo => {
+          const option = document.createElement("option");
+          option.value = cargo;
+          option.textContent = cargo;
+          cargoEvaluado.appendChild(option);
+        });
+
+        document.getElementById("unidadMinera").value = "";
+        document.getElementById("servicio").innerHTML = '<option value="">Seleccione primero una unidad minera</option>';
+        document.getElementById("evaluadoNombre").innerHTML = '<option value="">Seleccione primero un cargo</option>';
+
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      } catch (error) {
+        setMensaje("Error al cargar cargos permitidos: " + error.message);
+      }
+    }
+
+    function volverAPaso1() {
+      document.getElementById("step2").classList.remove("active");
+      document.getElementById("step1").classList.add("active");
+      setMensaje("");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    async function guardarTodo() {
+      const fecha = document.getElementById("fecha").value;
+      const cargoEvaluador = document.getElementById("cargoEvaluador").value;
+      const evaluadorNombre = document.getElementById("evaluadorNombre").value;
+      const unidadMinera = document.getElementById("unidadMinera").value;
+      const servicio = document.getElementById("servicio").value;
+      const cargoEvaluado = document.getElementById("cargoEvaluado").value;
+      const evaluadoNombre = document.getElementById("evaluadoNombre").value;
+
+      if (!fecha || !cargoEvaluador || !evaluadorNombre || !unidadMinera || !servicio || !cargoEvaluado || !evaluadoNombre) {
+        setMensaje("Complete todos los campos antes de guardar.");
+        return;
+      }
+
+      const puntajes = [];
+      for (let i = 1; i <= 20; i++) {
+        const seleccionado = document.querySelector(`input[name="item${i}"]:checked`);
+        if (!seleccionado) {
+          setMensaje(`Falta seleccionar una opción en el criterio ${i}.`);
+          return;
+        }
+        puntajes.push(Number(seleccionado.value));
+      }
+
+      setMensaje("Guardando evaluación...");
+
+      try {
+        const respuesta = await apiPost({
+          accion: "guardarEvaluacion",
+          fecha,
+          cargoEvaluador,
+          evaluadorNombre,
+          unidadMinera,
+          servicio,
+          cargoEvaluado,
+          evaluadoNombre,
+          puntajes
+        });
+
+        setMensaje(respuesta.mensaje || "Evaluación guardada correctamente.");
+
+        document.getElementById("formularioCriterios").reset();
+        document.getElementById("step2").classList.remove("active");
+        document.getElementById("step1").classList.add("active");
+
+        const hoy = new Date().toISOString().split("T")[0];
+        document.getElementById("fecha").value = hoy;
+        document.getElementById("cargoEvaluador").value = "";
+        document.getElementById("evaluadorNombre").innerHTML = '<option value="">Seleccione primero un cargo</option>';
+        document.getElementById("unidadMinera").value = "";
+        document.getElementById("servicio").innerHTML = '<option value="">Seleccione primero una unidad minera</option>';
+        document.getElementById("cargoEvaluado").innerHTML = '<option value="">Seleccione</option>';
+        document.getElementById("evaluadoNombre").innerHTML = '<option value="">Seleccione primero un cargo</option>';
+
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      } catch (error) {
+        setMensaje("Error: " + error.message);
+      }
+    }
+
+    cargarConfiguracion();
+  </script>
+</body>
+</html>
