@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registro de Movimientos</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 24px;
+      background: #f7f7f7;
+      margin: 0;
+    }
+
+    .contenedor {
+      max-width: 1100px;
+      margin: auto;
+      background: white;
+      padding: 24px;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+    }
+
+    h2, h3 {
+      margin-top: 0;
+      color: #1f2937;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .full {
+      grid-column: 1 / -1;
+    }
+
+    label {
+      display: block;
+      font-size: 14px;
+      font-weight: bold;
+      margin-bottom: 6px;
+      color: #374151;
+    }
+
+    input, select, button {
+      width: 100%;
+      padding: 10px;
+      font-family: Arial, sans-serif;
+      font-size: 14px;
+      box-sizing: border-box;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+    }
+
+    button {
+      cursor: pointer;
+      border: none;
+    }
+
+    .fila-botones {
+      display: flex;
+      gap: 12px;
+    }
+
+    .fila-botones button {
+      flex: 1;
+    }
+
+    .btn-principal {
+      background: #2563eb;
+      color: white;
+    }
+
+    .btn-secundario {
+      background: #6b7280;
+      color: white;
+    }
+
+    .btn-x {
+      background: #ef4444;
+      color: white;
+      border-radius: 8px;
+      padding: 10px 14px;
+      width: auto;
+    }
+
+    .btn-mas {
+      background: #2563eb;
+      color: white;
+      width: auto;
+      padding: 10px 16px;
+    }
+
+    .mensaje {
+      margin-top: 16px;
+      font-weight: bold;
+      color: #111827;
+    }
+
+    .oculto {
+      display: none;
+    }
+
+    .resumen {
+      background: #f1f5f9;
+      border: 1px solid #dbe3ea;
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 16px;
+    }
+
+    .resumen div {
+      margin-bottom: 6px;
+    }
+
+    .resumen strong {
+      display: inline-block;
+      min-width: 110px;
+    }
+
+    .tabla-items {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+
+    .tabla-items th,
+    .tabla-items td {
+      border: 1px solid #dbe3ea;
+      padding: 8px;
+      text-align: center;
+      vertical-align: middle;
+    }
+
+    .tabla-items th {
+      background: #f8fafc;
+    }
+
+    .acciones-items {
+      display: flex;
+      justify-content: flex-start;
+      margin-top: 10px;
+    }
+
+    .sin-items {
+      color: #6b7280;
+      font-size: 13px;
+      margin-top: 8px;
+    }
+
+    @media (max-width: 768px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .fila-botones {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="contenedor">
+    <h2>Registro de Movimientos</h2>
+
+    <div id="paso1">
+      <h3>Paso 1: Selecciona origen, destino y responsable</h3>
+
+      <div class="grid">
+        <div>
+          <label>Ubicación</label>
+          <select id="origenPaso1">
+            <option value="">Seleccione</option>
+            <option>TALLER CALAMA</option>
+            <option>CENTINELA DIMARZA</option>
+            <option>CENTINELA SEMIVA</option>
+            <option>SIERRA GORDA DIMARZA</option>
+            <option>SIERRA GORDA SEMIVA</option>
+            <option>TALLER 6</option>
+            <option>QUELLAVECO</option>
+            <option>ANTAPACCAY</option>
+          </select>
+        </div>
+
+        <div>
+          <label>Destino</label>
+          <select id="destinoPaso1">
+            <option value="">Seleccione</option>
+            <option>TALLER CALAMA</option>
+            <option>CENTINELA DIMARZA</option>
+            <option>CENTINELA SEMIVA</option>
+            <option>SIERRA GORDA DIMARZA</option>
+            <option>SIERRA GORDA SEMIVA</option>
+            <option>TALLER 6</option>
+            <option>QUELLAVECO</option>
+            <option>ANTAPACCAY</option>
+            <option>SE QUEDA</option>
+          </select>
+        </div>
+
+        <div class="full">
+          <label>Responsable</label>
+          <input type="text" id="responsablePaso1">
+        </div>
+
+        <div class="full">
+          <button class="btn-principal" onclick="irPaso2()">Siguiente</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="paso2" class="oculto">
+      <h3>Paso 2: Completa el movimiento</h3>
+
+      <div class="resumen">
+        <div><strong>Origen:</strong> <span id="resumenOrigen"></span></div>
+        <div><strong>Destino:</strong> <span id="resumenDestino"></span></div>
+        <div><strong>Responsable:</strong> <span id="resumenResponsable"></span></div>
+      </div>
+
+      <div class="grid">
+        <div>
+          <label>Fecha</label>
+          <input type="date" id="fecha">
+        </div>
+
+        <div>
+          <label>Tipo</label>
+          <select id="tipo">
+            <option value="">Seleccione</option>
+            <option>Ingreso</option>
+            <option>Salida</option>
+          </select>
+        </div>
+
+        <div>
+          <label>Contrato</label>
+          <input type="text" id="contrato">
+        </div>
+
+        <div>
+          <label>Observación</label>
+          <select id="observacion">
+            <option value="">Seleccione</option>
+            <option>TRASLADO</option>
+            <option>DEVOLUCION</option>
+            <option>DAÑADO</option>
+            <option>PERDIDO</option>
+            <option>COMPRA</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="full" style="margin-top:18px;">
+        <h3>Ítems del movimiento</h3>
+
+        <table class="tabla-items">
+          <thead>
+            <tr>
+              <th style="width: 30%;">Grupo</th>
+              <th style="width: 40%;">Subgrupo</th>
+              <th style="width: 20%;">Cantidad</th>
+              <th style="width: 10%;">Acción</th>
+            </tr>
+          </thead>
+          <tbody id="tbodyItems"></tbody>
+        </table>
+
+        <div class="acciones-items">
+          <button type="button" class="btn-mas" onclick="agregarFilaItem()">+ Agregar ítem</button>
+        </div>
+      </div>
+
+      <div class="full fila-botones" style="margin-top:18px;">
+        <button type="button" class="btn-secundario" onclick="volverPaso1()">Volver</button>
+        <button type="button" class="btn-principal" onclick="registrar()">Registrar movimiento</button>
+      </div>
+    </div>
+
+    <div class="mensaje" id="mensaje"></div>
+  </div>
+
+  <script>
+    const API_URL = 'https://script.google.com/macros/s/AKfycbyhe5lkU8SiIv-q15LnW9nCve3cRnNxOEDEwqRIbwFbyEiHN5HU3hPxsCbaVkCm94d5/exec';
+    let mapaGrupos = {};
+
+    async function cargarMapaGrupos() {
+      try {
+        const respuesta = await fetch(API_URL + '?accion=grupos');
+        mapaGrupos = await respuesta.json();
+      } catch (error) {
+        document.getElementById('mensaje').textContent = 'Error cargando grupos: ' + error.message;
+      }
+    }
+
+    function irPaso2() {
+      const origen = document.getElementById('origenPaso1').value;
+      const destino = document.getElementById('destinoPaso1').value;
+      const responsable = document.getElementById('responsablePaso1').value.trim();
+      const mensaje = document.getElementById('mensaje');
+
+      mensaje.textContent = '';
+
+      if (!origen || !destino || !responsable) {
+        mensaje.textContent = 'Completa origen, destino y responsable.';
+        return;
+      }
+
+      if (origen === destino) {
+        mensaje.textContent = 'Origen y destino no pueden ser iguales.';
+        return;
+      }
+
+      document.getElementById('resumenOrigen').textContent = origen;
+      document.getElementById('resumenDestino').textContent = destino;
+      document.getElementById('resumenResponsable').textContent = responsable;
+
+      document.getElementById('paso1').classList.add('oculto');
+      document.getElementById('paso2').classList.remove('oculto');
+
+      if (document.getElementById('tbodyItems').children.length === 0) {
+        agregarFilaItem();
+      }
+    }
+
+    function volverPaso1() {
+      document.getElementById('paso2').classList.add('oculto');
+      document.getElementById('paso1').classList.remove('oculto');
+      document.getElementById('mensaje').textContent = '';
+    }
+
+    function crearSelectGrupo() {
+      const select = document.createElement('select');
+      select.innerHTML = '<option value="">Seleccione</option>';
+
+      Object.keys(mapaGrupos).forEach(g => {
+        const opt = document.createElement('option');
+        opt.value = g;
+        opt.textContent = g;
+        select.appendChild(opt);
+      });
+
+      return select;
+    }
+
+    function crearSelectSubgrupo() {
+      const select = document.createElement('select');
+      select.innerHTML = '<option value="">Seleccione</option>';
+      return select;
+    }
+
+    function agregarFilaItem() {
+      const tbody = document.getElementById('tbodyItems');
+      const tr = document.createElement('tr');
+
+      const tdGrupo = document.createElement('td');
+      const tdSubgrupo = document.createElement('td');
+      const tdCantidad = document.createElement('td');
+      const tdAccion = document.createElement('td');
+
+      const selectGrupo = crearSelectGrupo();
+      const selectSubgrupo = crearSelectSubgrupo();
+
+      selectGrupo.addEventListener('change', function() {
+        const grupo = this.value;
+        selectSubgrupo.innerHTML = '<option value="">Seleccione</option>';
+
+        if (grupo && mapaGrupos[grupo]) {
+          mapaGrupos[grupo].forEach(sub => {
+            const opt = document.createElement('option');
+            opt.value = sub;
+            opt.textContent = sub;
+            selectSubgrupo.appendChild(opt);
+          });
+        }
+      });
+
+      const inputCantidad = document.createElement('input');
+      inputCantidad.type = 'number';
+      inputCantidad.min = '1';
+      inputCantidad.step = '1';
+      inputCantidad.placeholder = 'Cantidad';
+
+      const btnEliminar = document.createElement('button');
+      btnEliminar.type = 'button';
+      btnEliminar.className = 'btn-x';
+      btnEliminar.textContent = 'X';
+      btnEliminar.onclick = function() {
+        tr.remove();
+      };
+
+      tdGrupo.appendChild(selectGrupo);
+      tdSubgrupo.appendChild(selectSubgrupo);
+      tdCantidad.appendChild(inputCantidad);
+      tdAccion.appendChild(btnEliminar);
+
+      tr.appendChild(tdGrupo);
+      tr.appendChild(tdSubgrupo);
+      tr.appendChild(tdCantidad);
+      tr.appendChild(tdAccion);
+
+      tbody.appendChild(tr);
+    }
+
+    function obtenerMovimientos() {
+      const filas = document.querySelectorAll('#tbodyItems tr');
+      const movimientos = [];
+
+      filas.forEach(tr => {
+        const selects = tr.querySelectorAll('select');
+        const inputCantidad = tr.querySelector('input');
+
+        const grupo = selects[0].value;
+        const subgrupo = selects[1].value;
+        const cantidad = inputCantidad.value;
+
+        if (grupo && subgrupo && cantidad) {
+          movimientos.push({
+            grupo: grupo,
+            subgrupo: subgrupo,
+            cantidad: cantidad
+          });
+        }
+      });
+
+      return movimientos;
+    }
+
+    async function registrar() {
+      const movimientos = obtenerMovimientos();
+
+      const datos = {
+        fecha: document.getElementById('fecha').value,
+        tipo: document.getElementById('tipo').value,
+        origen: document.getElementById('origenPaso1').value,
+        destino: document.getElementById('destinoPaso1').value,
+        responsable: document.getElementById('responsablePaso1').value.trim(),
+        observacion: document.getElementById('observacion').value,
+        contrato: document.getElementById('contrato').value.trim(),
+        movimientos: movimientos
+      };
+
+      const mensaje = document.getElementById('mensaje');
+
+      if (!datos.fecha || !datos.tipo || !datos.observacion) {
+        mensaje.textContent = 'Completa fecha, tipo y observación.';
+        return;
+      }
+
+      if (movimientos.length === 0) {
+        mensaje.textContent = 'Agrega al menos un ítem válido.';
+        return;
+      }
+
+      mensaje.textContent = 'Registrando...';
+
+      try {
+        const respuesta = await fetch(API_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'text/plain;charset=utf-8'
+          },
+          body: JSON.stringify(datos)
+        });
+
+        const res = await respuesta.json();
+
+        if (!res.ok) {
+          throw new Error(res.error || 'No se pudo registrar');
+        }
+
+        mensaje.textContent =
+          'Movimiento registrado correctamente. Registros creados: ' +
+          res.cantidadRegistros + ' | ID: ' + res.idMovimiento;
+
+        document.getElementById('fecha').value = '';
+        document.getElementById('tipo').value = '';
+        document.getElementById('observacion').value = '';
+        document.getElementById('contrato').value = '';
+        document.getElementById('tbodyItems').innerHTML = '';
+
+        document.getElementById('origenPaso1').value = '';
+        document.getElementById('destinoPaso1').value = '';
+        document.getElementById('responsablePaso1').value = '';
+        document.getElementById('resumenOrigen').textContent = '';
+        document.getElementById('resumenDestino').textContent = '';
+        document.getElementById('resumenResponsable').textContent = '';
+
+        document.getElementById('paso2').classList.add('oculto');
+        document.getElementById('paso1').classList.remove('oculto');
+
+      } catch (error) {
+        mensaje.textContent = 'Error: ' + error.message;
+      }
+    }
+
+    cargarMapaGrupos();
+  </script>
+</body>
+</html>
